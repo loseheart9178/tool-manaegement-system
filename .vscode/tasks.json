@@ -1,0 +1,46 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build C project",
+            "type": "shell",
+            "command": "mkdir -p build && clang -std=c11 -Wall -Wextra -g src/*.c -Iinclude -o build/tool_manager",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Run C project",
+            "type": "shell",
+            "command": "./build/tool_manager",
+            "dependsOn": "Build C project",
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Clean build",
+            "type": "shell",
+            "command": "rm -f build/tool_manager build/*.o",
+            "problemMatcher": []
+        }
+    ]
+}

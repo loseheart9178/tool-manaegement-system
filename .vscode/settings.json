@@ -1,0 +1,15 @@
+{
+    "C_Cpp.default.compilerPath": "/usr/bin/clang",
+    "C_Cpp.default.cStandard": "c11",
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/include"
+    ],
+    "clangd.fallbackFlags": [
+        "-std=c11",
+        "-I${workspaceFolder}/include"
+    ],
+    "files.associations": {
+        "*.h": "c"
+    },
+    "terminal.integrated.defaultProfile.osx": "zsh"
+}

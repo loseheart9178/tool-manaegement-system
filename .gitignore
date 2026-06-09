@@ -1,0 +1,14 @@
+build/*
+!build/.gitkeep
+
+*.o
+*.exe
+*.out
+*.dSYM/
+
+.DS_Store
+
+data/*.txt
+!data/.gitkeep
+
+.codegraph/
