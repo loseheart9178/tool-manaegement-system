@@ -1,10 +1,12 @@
 {
+    "C_Cpp.intelliSenseEngine": "disabled",
     "C_Cpp.default.compilerPath": "/usr/bin/clang",
     "C_Cpp.default.cStandard": "c11",
     "C_Cpp.default.includePath": [
         "${workspaceFolder}/include"
     ],
     "clangd.fallbackFlags": [
+        "-xc",
         "-std=c11",
         "-I${workspaceFolder}/include"
     ],

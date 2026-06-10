@@ -2,6 +2,61 @@
 #include <string.h>
 #include "tool.h"
 
+/* ---- 表格对齐辅助函数（按显示宽度而非字节数对齐） ---- */
+
+/* 计算 UTF-8 字符串的显示宽度：ASCII 为 1，中文等宽字符为 2 */
+static int disp_width(const char *s)
+{
+    int w = 0;
+    while (*s)
+    {
+        if ((*s & 0x80) == 0)           /* 单字节 ASCII */
+        {
+            w++;
+            s++;
+        }
+        else if ((*s & 0xE0) == 0xC0)   /* 双字节 UTF-8 */
+        {
+            w += 2;
+            s += 2;
+        }
+        else if ((*s & 0xF0) == 0xE0)   /* 三字节 UTF-8（中文） */
+        {
+            w += 2;
+            s += 3;
+        }
+        else if ((*s & 0xF8) == 0xF0)   /* 四字节 UTF-8 */
+        {
+            w += 2;
+            s += 4;
+        }
+        else                             /* 非法序列兜底 */
+        {
+            w++;
+            s++;
+        }
+    }
+    return w;
+}
+
+/* 左对齐打印字符串，用空格补齐到 field_w 个显示列 */
+static void print_left(const char *s, int field_w)
+{
+    int dw = disp_width(s);
+    fputs(s, stdout);
+    for (int i = dw; i < field_w; i++) putchar(' ');
+}
+
+/* 右对齐打印字符串，用空格补齐到 field_w 个显示列 */
+static void print_right(const char *s, int field_w)
+{
+    int dw = disp_width(s);
+    for (int i = dw; i < field_w; i++) putchar(' ');
+    fputs(s, stdout);
+}
+
+/* ---- 工具管理核心函数 ---- */
+
 /* 按编号精确查找工具下标，未找到返回 -1。该函数会被同学 B 调用，签名不得修改。 */
 int find_tool_index_by_id(Tool tools[], int tool_count, const char tool_id[])
 {
@@ -23,18 +78,35 @@ void show_all_tools(Tool tools[], int tool_count)
     }
 
     printf("\n");
-    printf("%-12s %-30s %-12s %6s %6s %6s %-10s %10s\n",
-           "编号", "名称", "类型", "库存", "状态", "已借出", "位置", "单价");
-    printf("----------------------------------------------------------------------------------------------------------\n");
+    /* 表头 */
+    print_left("编号", 8);   putchar(' ');
+    print_left("名称", 26);  putchar(' ');
+    print_left("类型", 12);  putchar(' ');
+    print_right("库存", 6);  putchar(' ');
+    print_right("状态", 6);  putchar(' ');
+    print_right("已借出", 6); putchar(' ');
+    print_left("位置", 8);   putchar(' ');
+    print_right("单价", 10); putchar('\n');
+
+    /* 分隔线 */
+    for (int i = 0; i < 89; i++) putchar('-');
+    putchar('\n');
 
     for (int i = 0; i < tool_count; i++)
     {
-        printf("%-12s %-30s %-12s %6d %6s %6d %-10s %10.2f\n",
-               tools[i].id, tools[i].name, tools[i].type,
-               tools[i].stock, tools[i].status, tools[i].borrowed_count,
-               tools[i].location, tools[i].price);
+        print_left(tools[i].id, 8);    putchar(' ');
+        print_left(tools[i].name, 26); putchar(' ');
+        print_left(tools[i].type, 12); putchar(' ');
+        printf("%6d", tools[i].stock); putchar(' ');
+        print_right(tools[i].status, 6); putchar(' ');
+        printf("%6d", tools[i].borrowed_count); putchar(' ');
+        print_left(tools[i].location, 8); putchar(' ');
+        printf("%10.2f\n", tools[i].price);
     }
-    printf("----------------------------------------------------------------------------------------------------------\n");
+
+    /* 底部分隔线 */
+    for (int i = 0; i < 89; i++) putchar('-');
+    putchar('\n');
     printf("共 %d 条记录。\n", tool_count);
 }
 
@@ -276,9 +348,19 @@ void search_tools(Tool tools[], int tool_count)
     while (getchar() != '\n');
 
     printf("\n");
-    printf("%-12s %-30s %-12s %6s %6s %6s %-10s %10s\n",
-           "编号", "名称", "类型", "库存", "状态", "已借出", "位置", "单价");
-    printf("----------------------------------------------------------------------------------------------------------\n");
+    /* 表头 */
+    print_left("编号", 8);   putchar(' ');
+    print_left("名称", 26);  putchar(' ');
+    print_left("类型", 12);  putchar(' ');
+    print_right("库存", 6);  putchar(' ');
+    print_right("状态", 6);  putchar(' ');
+    print_right("已借出", 6); putchar(' ');
+    print_left("位置", 8);   putchar(' ');
+    print_right("单价", 10); putchar('\n');
+
+    /* 分隔线 */
+    for (int i = 0; i < 89; i++) putchar('-');
+    putchar('\n');
 
     int found = 0;
     for (int i = 0; i < tool_count; i++)
@@ -293,10 +375,14 @@ void search_tools(Tool tools[], int tool_count)
         }
         if (match)
         {
-            printf("%-12s %-30s %-12s %6d %6s %6d %-10s %10.2f\n",
-                   tools[i].id, tools[i].name, tools[i].type,
-                   tools[i].stock, tools[i].status, tools[i].borrowed_count,
-                   tools[i].location, tools[i].price);
+            print_left(tools[i].id, 8);    putchar(' ');
+            print_left(tools[i].name, 26); putchar(' ');
+            print_left(tools[i].type, 12); putchar(' ');
+            printf("%6d", tools[i].stock); putchar(' ');
+            print_right(tools[i].status, 6); putchar(' ');
+            printf("%6d", tools[i].borrowed_count); putchar(' ');
+            print_left(tools[i].location, 8); putchar(' ');
+            printf("%10.2f\n", tools[i].price);
             found++;
         }
     }
@@ -305,7 +391,8 @@ void search_tools(Tool tools[], int tool_count)
         printf("未找到匹配的工具。\n");
     else
     {
-        printf("----------------------------------------------------------------------------------------------------------\n");
+        for (int i = 0; i < 89; i++) putchar('-');
+        putchar('\n');
         printf("共找到 %d 条匹配记录。\n", found);
     }
 }

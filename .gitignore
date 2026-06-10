@@ -12,3 +12,7 @@ data/*.txt
 !data/.gitkeep
 
 .codegraph/
+.claude/
+deliverables/package_tmp/
+__pycache__/
+node_modules/
